@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 export default function Checkout() {
@@ -6,13 +6,25 @@ export default function Checkout() {
   const navigate = useNavigate();
   const course = location.state?.course;
 
+  const [isProcessing, setIsProcessing] = useState(false);
+
   useEffect(() => {
     if (!course) {
-      navigate("/"); 
+      navigate("/"); // Redirect if accessed directly
     }
   }, [course, navigate]);
 
-  if (!course) return null; 
+  const handlePayment = () => {
+    setIsProcessing(true);
+
+    // Simulate 2-second payment processing delay
+    setTimeout(() => {
+      navigate("/success", { state: { course } });
+    }, 2000);
+  };
+
+  if (!course) return null;
+
   return (
     <div className="max-w-xl mx-auto px-4 py-12 text-center">
       <h2 className="text-3xl font-bold mb-4 text-blue-700">Checkout</h2>
@@ -29,12 +41,19 @@ export default function Checkout() {
         </ul>
       </div>
 
-      <button
-        onClick={() => navigate("/success")}
-        className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-6 py-3 rounded-md transition duration-300"
-      >
-        Confirm & Pay ₹499
-      </button>
+      {isProcessing ? (
+        <div className="flex items-center justify-center space-x-2">
+          <div className="w-6 h-6 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-blue-600 font-medium text-lg">Processing payment...</p>
+        </div>
+      ) : (
+        <button
+          onClick={handlePayment}
+          className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-6 py-3 rounded-md transition duration-300"
+        >
+          Confirm & Pay ₹499
+        </button>
+      )}
     </div>
   );
 }
